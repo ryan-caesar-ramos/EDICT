@@ -1,3 +1,4 @@
+
 from functools import partial
 
 import numpy as np
@@ -134,7 +135,7 @@ class FirUpsample2D(nn.Module):
             kernel = [1] * factor
 
         # setup kernel
-        kernel = np.asarray(kernel, dtype=np.float64)
+        kernel = np.asarray(kernel, dtype=np.float16)
         if kernel.ndim == 1:
             kernel = np.outer(kernel, kernel)
         kernel /= np.sum(kernel)
@@ -219,7 +220,7 @@ class FirDownsample2D(nn.Module):
             kernel = [1] * factor
 
         # setup kernel
-        kernel = np.asarray(kernel, dtype=np.float64)
+        kernel = np.asarray(kernel, dtype=np.float16)
         if kernel.ndim == 1:
             kernel = np.outer(kernel, kernel)
         kernel /= np.sum(kernel)
@@ -333,7 +334,7 @@ class ResnetBlock2D(nn.Module):
 
         # make sure hidden states is in float32
         # when running in half-precision
-        hidden_states = self.norm1(hidden_states.double()).type(hidden_states.dtype)
+        hidden_states = self.norm1(hidden_states).type(hidden_states.dtype)
         hidden_states = self.nonlinearity(hidden_states)
 
         if self.upsample is not None:
@@ -351,7 +352,7 @@ class ResnetBlock2D(nn.Module):
 
         # make sure hidden states is in float32
         # when running in half-precision
-        hidden_states = self.norm2(hidden_states.double()).type(hidden_states.dtype)
+        hidden_states = self.norm2(hidden_states).type(hidden_states.dtype)
         hidden_states = self.nonlinearity(hidden_states)
 
         hidden_states = self.dropout(hidden_states)
@@ -391,7 +392,7 @@ def upsample_2d(x, kernel=None, factor=2, gain=1):
     if kernel is None:
         kernel = [1] * factor
 
-    kernel = np.asarray(kernel, dtype=np.float64)
+    kernel = np.asarray(kernel, dtype=np.float16)
     if kernel.ndim == 1:
         kernel = np.outer(kernel, kernel)
     kernel /= np.sum(kernel)
@@ -425,7 +426,7 @@ def downsample_2d(x, kernel=None, factor=2, gain=1):
     if kernel is None:
         kernel = [1] * factor
 
-    kernel = np.asarray(kernel, dtype=np.float64)
+    kernel = np.asarray(kernel, dtype=np.float16)
     if kernel.ndim == 1:
         kernel = np.outer(kernel, kernel)
     kernel /= np.sum(kernel)
