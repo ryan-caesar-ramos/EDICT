@@ -74,7 +74,7 @@ class AttentionBlock(nn.Module):
         scale = 1 / math.sqrt(math.sqrt(self.channels / self.num_heads))
 
         attention_scores = torch.matmul(query_states * scale, key_states.transpose(-1, -2) * scale)
-        attention_probs = torch.softmax(attention_scores.double(), dim=-1).type(attention_scores.dtype)
+        attention_probs = torch.softmax(attention_scores, dim=-1).type(attention_scores.dtype)
 
         # compute attention output
         hidden_states = torch.matmul(attention_probs, value_states)
