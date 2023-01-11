@@ -21,10 +21,17 @@ import pickle
 
 # StableDiffusion P2P implementation originally from https://github.com/bloc97/CrossAttentionControl
 
-# Have diffusers with hardcoded double-casting instead of float
-from my_diffusers import AutoencoderKL, UNet2DConditionModel
-from my_diffusers.schedulers.scheduling_utils import SchedulerOutput
-from my_diffusers import LMSDiscreteScheduler, PNDMScheduler, DDPMScheduler, DDIMScheduler
+use_half_prec = True
+
+if use_half_prec:
+    from my_half_diffusers import AutoencoderKL, UNet2DConditionModel
+    from my_half_diffusers.schedulers.scheduling_utils import SchedulerOutput
+    from my_half_diffusers import LMSDiscreteScheduler, PNDMScheduler, DDPMScheduler, DDIMScheduler
+else:
+    # Have diffusers with hardcoded double-casting instead of float if not using half precision
+    from my_diffusers import AutoencoderKL, UNet2DConditionModel
+    from my_diffusers.schedulers.scheduling_utils import SchedulerOutput
+    from my_diffusers import LMSDiscreteScheduler, PNDMScheduler, DDPMScheduler, DDIMScheduler
 
 
 import random
@@ -49,9 +56,14 @@ vae = AutoencoderKL.from_pretrained(model_path_diffusion, subfolder="vae", use_a
 
 # Push to devices w/ double precision
 device = 'cuda'
-unet.double().to(device)
-vae.double().to(device)
-clip.double().to(device)
+if use_half_prec:
+    unet.to(device)
+    vae.to(device)
+    clip.to(device)
+else:
+    unet.double().to(device)
+    vae.double().to(device)
+    clip.double().to(device)
 print("Loaded all models")
 
     
@@ -334,7 +346,7 @@ def baseline_stablediffusion(prompt="",
     #Preprocess image if it exists (img2img)
     if init_image is not None:
         init_image = init_image.resize((width, height), resample=Image.Resampling.LANCZOS)
-        init_image = np.array(init_image).astype(np.float64) / 255.0 * 2.0 - 1.0
+        init_image = np.array(init_image).astype(np.float16) / 255.0 * 2.0 - 1.0
         init_image = torch.from_numpy(init_image[np.newaxis, ...].transpose(0, 3, 1, 2))
 
         #If there is alpha channel, composite alpha for white, as the diffusion model does not support alpha channel
@@ -374,7 +386,7 @@ def baseline_stablediffusion(prompt="",
     if prev_image is not None:
         #Resize and prev_image for numpy b h w c -> torch b c h w
         prev_image = prev_image.resize((width, height), resample=Image.Resampling.LANCZOS)
-        prev_image = np.array(prev_image).astype(np.float64) / 255.0 * 2.0 - 1.0
+        prev_image = np.array(prev_image).astype(np.float16) / 255.0 * 2.0 - 1.0
         prev_image = torch.from_numpy(prev_image[np.newaxis, ...].transpose(0, 3, 1, 2))
         
         #If there is alpha channel, composite alpha for white, as the diffusion model does not support alpha channel
@@ -681,7 +693,7 @@ def coupled_stablediffusion(prompt="",
         else:
             #Resize and transpose for numpy b h w c -> torch b c h w
             im = im.resize((width, height), resample=Image.Resampling.LANCZOS)
-            im = np.array(im).astype(np.float64) / 255.0 * 2.0 - 1.0
+            im = np.array(im).astype(np.float16) / 255.0 * 2.0 - 1.0
             # check if black and white
             if len(im.shape) < 3:
                 im = np.stack([im for _ in range(3)], axis=2) # putting at end b/c channels
@@ -729,7 +741,7 @@ def coupled_stablediffusion(prompt="",
         noise = torch.randn(init_latent.shape,
                             generator=generator,
                             device=device,
-                           dtype=torch.float64)
+                           dtype=torch.float16)
         if fixed_starting_latent is None:
             latent = noise
         else:
