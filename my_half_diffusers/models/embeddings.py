@@ -38,11 +38,11 @@ def get_timestep_embedding(
     assert len(timesteps.shape) == 1, "Timesteps should be a 1d-array"
 
     half_dim = embedding_dim // 2
-    exponent = -math.log(max_period) * torch.arange(start=0, end=half_dim, dtype=torch.float64)
+    exponent = -math.log(max_period) * torch.arange(start=0, end=half_dim, dtype=torch.float32)
     exponent = exponent / (half_dim - downscale_freq_shift)
 
     emb = torch.exp(exponent).to(device=timesteps.device)
-    emb = timesteps[:, None].double() * emb[None, :]
+    emb = timesteps[:, None] * emb[None, :]
 
     # scale embeddings
     emb = scale * emb
@@ -57,7 +57,7 @@ def get_timestep_embedding(
     # zero pad
     if embedding_dim % 2 == 1:
         emb = torch.nn.functional.pad(emb, (0, 1, 0, 0))
-    return emb
+    return emb.to(torch.float16)
 
 
 class TimestepEmbedding(nn.Module):
