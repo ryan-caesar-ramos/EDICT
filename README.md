@@ -1,3 +1,18 @@
+# Note
+
+This is an unofficial implementation of EDICT at half precision following the [comments of the original author](https://github.com/salesforce/EDICT/issues/1#issuecomment-1375994018).
+
+This implementation was tested on Colab where condacolab was creating issues. Hence the original installation instructions were forwent and the following lines reflect the installation used instead:
+
+```
+pip install diffusers==0.6.0 scipy==1.9.3 omegaconf==2.1.1 pillow==9.2.0
+pip install -U transformers
+```
+
+The first line installs packages using the versions specified by the original `environment.yaml`; an upgraded version of `transformers` was used because the version specified by the original yaml was causing issues that others reported as solved after upgrading.
+
+The rest of the original README.md is left untouched below:
+
 # Official Implementation of EDICT: Exact Diffusion Inversion via Coupled Transformations
 
 [Arxiv](https://arxiv.org/abs/2211.12446)
