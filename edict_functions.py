@@ -164,7 +164,7 @@ def load_im_into_format_from_path(im_path):
 #### P2P STUFF #### 
 def init_attention_weights(weight_tuples):
     tokens_length = clip_tokenizer.model_max_length
-    weights = torch.ones(tokens_length)
+    weights = torch.ones(tokens_length, dtype=torch.float16 if use_half_prec else torch.float)
     
     for i, w in weight_tuples:
         if i < tokens_length and i >= 0:
