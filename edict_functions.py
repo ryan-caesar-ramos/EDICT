@@ -685,7 +685,7 @@ def coupled_stablediffusion(prompt="",
     if seed is None: seed = random.randrange(2**32 - 1)
     generator = torch.cuda.manual_seed(seed)
 
-    def image_to_latent(im):
+    def image_to_latent(im, dtype=torch.float16 if use_half_prec else torch.float):
         if isinstance(im, torch.Tensor):
             # assume it's the latent
             # used to avoid clipping new generation before inversion
@@ -708,7 +708,7 @@ def coupled_stablediffusion(prompt="",
             im = im.to(device)
             #Encode image
             init_latent = vae.encode(im).latent_dist.sample(generator=generator) * 0.18215
-            return init_latent
+            return init_latent.to(dtype)
     assert not use_lms, "Can't invert LMS the same as DDIM"
     if run_baseline: leapfrog_steps=False
     #Change size to multiple of 64 to prevent size mismatches inside model
