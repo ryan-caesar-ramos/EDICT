@@ -11,6 +11,8 @@ pip install -U transformers
 
 The first line installs packages using the versions specified by the original `environment.yaml`; an upgraded version of `transformers` was used because the version specified by the original yaml was causing issues that others reported as solved after upgrading.
 
+The repository previously only involved minimal changes required to add half precision functionality, but as of 01/31/23 now contains undocumented QoL features for personal use. Please let me know if you need me to document these, though an official implementation for half precision [should be underway by the original authors](https://github.com/salesforce/EDICT/issues/1#issuecomment-1396216563).
+
 The rest of the original README.md is left untouched below:
 
 # Official Implementation of EDICT: Exact Diffusion Inversion via Coupled Transformations
