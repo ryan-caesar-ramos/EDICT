@@ -103,7 +103,7 @@ def EDICT_editing(im_path,
     """
     # Resize/center crop to 512x512 (Can do higher res. if desired)
     if isinstance(im_path, Image.Image):
-        orig_lm = center_crop(im_path).resize((512, 512)
+        orig_lm = center_crop(im_path).resize((512, 512))
     else:
         orig_im = load_im_into_format_from_path(im_path) if isinstance(im_path, str) else im_path # trust OK
     
