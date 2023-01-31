@@ -9,7 +9,6 @@ import torchvision
 import torch.nn.functional as F
 import torch
 import numpy as np
-from PIL import Image
 import matplotlib.pyplot as plt
 import time
 import datetime
@@ -103,7 +102,10 @@ def EDICT_editing(im_path,
         If run_baseline=False then they will be two nearly identical edited versions
     """
     # Resize/center crop to 512x512 (Can do higher res. if desired)
-    orig_im = load_im_into_format_from_path(im_path) if isinstance(im_path, str) else im_path # trust OK
+    if isinstance(im_path, Image.Image):
+        orig_lm = center_crop(im_path).resize((512, 512)
+    else:
+        orig_im = load_im_into_format_from_path(im_path) if isinstance(im_path, str) else im_path # trust OK
     
     # compute latent pair (second one will be original latent if run_baseline=True)
     latents = coupled_stablediffusion(base_prompt,
